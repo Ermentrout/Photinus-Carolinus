@@ -1,0 +1,52 @@
+# this uses a dynamic library to look at connectivity and speed up
+# the code when bugs are flying
+# gcc -fPIC -dynamiclib -O3 -o IZ.SO iz.c (MAC)
+# gcc -fPIC -shared -O3 -o IZ.SO iz.c (LINUX)
+@ autoeval=0
+@ meth=euler
+
+table w % 100 0 99 2*(ran(1)-.5)
+table ep % 100 0 99 2*(ran(1)-.5)
+
+# here is where we get the coupling
+
+special bc=import(IZ.SO,IZ,100,u0)
+r[0..99]=u[j]^2+v[j]^2
+lm[0..99]=lam[j]+b*r[j]-r[j]^2
+u[0..99]'=u[j]*lm[j]-v[j]*(1+ww*w([j]))+g*bc([j])+sigu*normal(0,1)
+v[0..99]'=v[j]*lm[j]+u[j]*(1+ww*w([j]))+sigu*normal(0,1)
+lam[0..99]'=eps*(rbar-r[j])*(1+ee*ep([j]))+sigl*normal(0,1)
+
+x[0..99]'=vmax*([j]<nmov)*cos(th[j])
+y[0..99]'=vmax*([j]<nmov)*sin(th[j])
+th[0..99]'=sig*normal(0,1)
+s[0..99]=heav(u[j]-thr)
+
+x[0..99](0)=ran(1)
+y[0..99](0)=ran(1)
+th[0..99](0)=ran(1)*2*pi
+par sig=.03,vmax=.01,nmov=-1
+par rbar=.05,b=.5,thr=.2,rad=.09
+par eps=.04
+par g=0
+# these are the noise to u,v and lambda
+par sigu=0,sigl=0.07
+
+
+aux s[0..99]=s[j]
+stot=sum(0,99)of(shift(s0,i'))/100
+aux stot=stot
+aux cp[0..99]=bc([j])
+phase[0..99]=atan2(u[j],v[j])
+ssin=sum(0,99)of(sin(shift(phase0,i')))/100
+scos=sum(0,99)of(cos(shift(phase0,i')))/100
+aux op=sqrt(ssin^2+scos^2)
+
+@ total=2000,bound=100000
+u[0..99](0)=ran(1)-.5
+lam[0..99](0)=.3*(ran(1)-.5)
+# added 5% heterogeneity
+par ww=0.05,ee=0.05
+
+
+d

@@ -1,0 +1,20 @@
+@ autoeval=0
+table w % 100 0 99 2*(ran(1)-.5)
+table ep % 100 0 99 2*(ran(1)-.5)
+r[0..99]=x[j]^2+y[j]^2
+lm[0..99]=lam[j]+b*r[j]-r[j]^2
+x[0..99]'=x[j]*lm[j]-y[j]*(1+ww*w([j]))+g*stot
+y[0..99]'=y[j]*lm[j]+x[j]*(1+ww*w([j]))
+lam[0..99]'=eps*(rbar-r[j])*(1+ee*ep([j]))
+s[0..99]=heav(x[j]-thr)
+stot=sum(0,99)of(shift(s0,i'))/100
+par rbar=.05,b=.5,thr=.2
+par eps=.04
+par g=0
+@ total=2000
+x[0..99](0)=ran(1)-.5
+lam[0..99](0)=.3*(ran(1)-.5)
+par ww=0,ee=0
+aux stot=stot
+
+d

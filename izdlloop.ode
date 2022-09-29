@@ -1,0 +1,64 @@
+# this uses a dynamic library to look at connectivity and speed up
+# the code when bugs are flying
+# gcc -fPIC -dynamiclib -O3 -o IZ.SO iz.c (MAC)
+# gcc -fPIC -shared -O3 -o IZ.SO iz.c (LINUX)
+@ autoeval=0
+@ meth=euler
+
+table w % 100 0 99 2*(ran(1)-.5)
+table ep % 100 0 99 2*(ran(1)-.5)
+
+# here is where we get the coupling
+
+special bc=import(IZ.SO,IZ,100,u0)
+r[0..99]=u[j]^2+v[j]^2
+al[0..99]=heav(nff-[j])
+lm[0..99]=lam[j]+b*r[j]-r[j]^2
+u[0..99]'=(u[j]*lm[j]-v[j]*(1+ww*w([j]))+g*bc([j]))+sigu*normal(0,1)
+v[0..99]'=(v[j]*lm[j]+u[j]*(1+ww*w([j])))
+lam[0..99]'=al[j]*eps*(rbar-r[j])*(1+ee*ep([j]))+sigl*normal(0,1)+(al[j]-1)*(lam[j]+1)
+
+x[0..99]'=vmax*([j]<nmov)*cos(th[j])
+y[0..99]'=vmax*([j]<nmov)*sin(th[j])
+th[0..99]'=sig*normal(0,1)
+s[0..99]=heav(u[j]-thr)
+sb[0..99]'=heav(t-2000)*s[j]
+sbsb[0..99]'=heav(t-2000)*s[j]*s[j]
+sbr[0..99]=sb[j]/max(1,t-2000)
+svr[0..99]=sbsb[j]/max(1,t-2000)-sbr[j]^2
+svrb=sum(0,nff)of(shift(svr0,i'))/(nff+1)
+aux svrb=svrb
+x[0..99](0)=ran(1)
+y[0..99](0)=ran(1)
+th[0..99](0)=ran(1)*2*pi
+par sig=.03,vmax=.01,nmov=-1
+par rbar=.05,b=.5,thr=.2,rad=.04
+
+par eps=.04
+par g=0.02
+par nff=101
+par eta=1
+par sigl=.03,sigu=.01
+aux s[0..99]=s[j]
+stot=sum(0,nff)of(shift(s0,i'))/(nff+1)
+st'=heav(t-2000)*sum(0,nff)of(shift(s0,i'))/(nff+1)
+stst'=heav(t-2000)*(sum(0,nff)of(shift(s0,i'))/(nff+1))^2
+stbar=st/max(1,t-2000)
+stvar=stst/max(1,t-2000)-stbar^2
+aux stvar=stvar
+aux chi=stvar/svrb
+aux stbar=stbar
+aux stott=stot
+aux cp[0..99]=bc([j])
+aux nflies=nff
+aux nmv=nmov+1
+aux spd=vmax
+@ total=20000,bound=100000,trans=19999.99,nout=500
+u[0..99](0)=ran(1)-.5
+lam[0..99](0)=.3*(ran(1)-.5)
+# added 5% heterogeneity
+par ww=0.05,ee=0.05
+aux gg=g
+aux rr=sqrt(rad)
+
+d

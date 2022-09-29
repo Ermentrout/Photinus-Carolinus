@@ -1,0 +1,5 @@
+frect 0;0;1;1;$BLACK
+fcircle mod(x[0..99],1);mod(y[j],1);.005+.015*heav(u[j]-thr);$YELLOWGREEN
+vtext .1;0;t=;t
+fcircle .5;.5;.005+.04*stot;$RED
+end

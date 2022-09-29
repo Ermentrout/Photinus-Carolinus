@@ -1,0 +1,20 @@
+@ meth=euler
+
+r=u^2+v^2
+lm=lam+b*r-r^2
+u'=u*lm-v+sigu*normal(0,1)
+v'=v*lm+u+sigu*normal(0,1)
+lam'=eps*(rbar-r)+sigl*normal(0,1)
+
+rf'=(-rf+sqrt(r))/tauf
+par rbar=.05,b=.5,thr=.2
+par eps=.04
+# these are the noise to u,v and lambda
+par sigu=0.01,sigl=0.07
+par tauf=20
+
+
+@ total=2000,bound=100000
+init u=1,lam=.04
+
+d
